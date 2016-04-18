@@ -11,6 +11,7 @@ Local $Archive_Dir = "L:\BACKUP"
 ;ConsoleWrite('Total available free space on ' & @HomeDrive & ' => ' & $aData[0] & ' bytes' & @CRLF)
 ;ConsoleWrite('Total available space on ' & @HomeDrive & ' => ' & $aData[1] & ' bytes' & @CRLF)
 ;ConsoleWrite('Total free space on ' & @HomeDrive & ' => ' & $aData[2] & ' bytes' & @CRLF)
+;Added comment on GitHub
 
 If Ceiling($cData[0]/1000000000) < 10 Then
 
