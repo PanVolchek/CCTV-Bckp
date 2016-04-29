@@ -9,12 +9,13 @@ Local $CCTV_Dir = "L:\"
 Local $Archive_Dir = "C:\TEMP\"
 Local $CCTV_Min = 200
 Local $Archive_Min = 10
+;Список камер
 Local $CamArr = ["DespArea1", "DespArea2", "FSA-LD", "FSA-RP", "Portal", "RSA"]
 Local $ArchMonthList [12] = ["99", "99", "99", "99", "99", "99", "99", "99", "99", "99", "99", "99"]
-Local $ArchDayList [31] = []
+Local $ArchDayList [32] = ["99", "99", "99", "99", "99", "99", "99", "99", "99", "99", "99", "99", "99", "99", "99", "99", "99", "99", "99", "99", "99", "99", "99", "99", "99", "99", "99", "99", "99", "99", "99", "99"]
 ;Local $ASearch = FileFindFirstFile($Archive_Dir&"Archive\"&$CamArr[1]&"2016\*.*")
 ;Local $ASearch = FileFindFirstFile("*.*")
-Local  $sFileName = ""
+Local $sFileName = ""
 Local $MinFromMonth
 Local $i=0
 Local $MonthCounter=0
@@ -31,8 +32,7 @@ Local $DayCounter=0
 
 
 ;ConsoleWrite("before Cycle  "&$ASearch&" $sFileName  "&$sFileName&@CRLF)
-
-
+#comments-start
 
 While $i<6
    FileChangeDir($Archive_Dir&"Archive\"&$CamArr[$i]&"\2016\")
@@ -40,7 +40,7 @@ While $i<6
    Local $ASearch = FileFindFirstFile("*.*")
 
     $sFileName = FileFindNextFile($ASearch)
-   ConsoleWrite($Archive_Dir&"Archive\"&$CamArr[$i]&"\2016\"&@CRLF)
+   ConsoleWrite($Archive_Dir&"Archive\"&$CamArr[$i]&"\2016\"&"   FuncMinMonth = "&@CRLF)
    While $sFileName <> 0
     $ArchMonthList[$MonthCounter] = $sFileName
 	ConsoleWrite("incycle-i= "&$i&" FileName =  "&$sFileName&" $ArchMonthList =  "&$ArchMonthList[$MonthCounter]&" Mcounter = "&$MonthCounter&@CRLF)
@@ -53,9 +53,53 @@ $sFileName = 0
    WEnd
 
 
- MsgBox($MB_SYSTEMMODAL, "Check free", "Total Size  " & Ceiling($PathData[1]/1000000000) & @CRLF & "  Free C:\ " & Ceiling($PathData[0]/1000000000) & " Gb" & @CRLF & " Free L:\ " & Ceiling($PathArchive[0]/1000000000) & " Gb" )
+#comments-end
 
+Func MinDataArch(ByRef $CamRef)
+local $MinArchPath
+local $MCounter
+local $DCounter
+$MCounter = 0
+$DCounter = 0
 
+FileChangeDir($Archive_Dir&"Archive\"&$CamRef&"\2016\")
+;Ищем минимальный месяц в $ArchMonthList[$MonthCounter] = $sFileName
+   Local $ASearch = FileFindFirstFile("*.*")
+    $sFileName = FileFindNextFile($ASearch)
+
+While $sFileName <> 0
+    $ArchMonthList[$MCounter] = $sFileName
+	;ConsoleWrite(" $ArchMonthList =  "&$ArchMonthList[$MCounter]&" Mcounter = "&$MCounter&@CRLF)
+	$sFileName = FileFindNextFile($ASearch)
+$MCounter = $MCounter + 1
+ wend
+;ConsoleWrite(" MinMonth= "&_ArrayMin ($ArchMonthList, 0, 0)&@CRLF)
+
+;Ищем минимальный День
+;ConsoleWrite("----------Day-----------"&@CRLF)
+;ConsoleWrite($Archive_Dir&"Archive\"&$CamRef&"\2016\"&_ArrayMin ($ArchMonthList, 0, 0)&@CRLF)
+FileChangeDir($Archive_Dir&"Archive\"&$CamRef&"\2016\"&_ArrayMin ($ArchMonthList, 0, 0))
+$ASearch = FileFindFirstFile("*.*")
+$sFileName = FileFindNextFile($ASearch)
+While $sFileName <> 0
+    $ArchDayList[$DCounter] = $sFileName
+	;ConsoleWrite(" $ArchDayList =  "&$ArchDayList[$DCounter]&" Dcounter = "&$DCounter&@CRLF)
+	$sFileName = FileFindNextFile($ASearch)
+$DCounter = $DCounter + 1
+ wend
+$MinArchPath = $Archive_Dir&"Archive\"&$CamRef&"\2016\"&_ArrayMin ($ArchMonthList, 0, 0)&"\"&_ArrayMin ($ArchDayList, 0, 0)
+;ConsoleWrite(" MinDate At all = "&$MinArchPath&@CRLF)
+
+;ConsoleWrite(" Current Cam is "&$CamRef&"  "&@CRLF&" $ASearch = "&$ASearch&" $sFileName = "&$sFileName&@CRLF)
+Return $MinArchPath
+EndFunc
+
+While $i<6
+ConsoleWrite("MinDataArch = "&MinDataArch($CamArr[$i])&@CRLF)
+
+;MsgBox($MB_SYSTEMMODAL, "Check free", "Total Size  " & Ceiling($PathData[1]/1000000000) & @CRLF & "  Free C:\ " & Ceiling($PathData[0]/1000000000) & " Gb" & @CRLF & " Free L:\ " & Ceiling($PathArchive[0]/1000000000) & " Gb" )
+$i = $i + 1
+wend
 
 If Ceiling($PathData[0]/1000000000) < $CCTV_Min Then
 
